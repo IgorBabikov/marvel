@@ -1,6 +1,7 @@
 import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
+import { Link } from 'react-router-dom';
 import {useState, useEffect} from 'react';
 
 import './comicsList.scss';
@@ -40,19 +41,19 @@ const ComicsList = () => {
    }
 
    function renderItems(arr) {
-    const items =  arr.map((item) => {
+    const items =  arr.map((item, i) => {
         let imgStyle = {'objectFit' : 'cover'};
         if (item.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg') {
             imgStyle = {'objectFit' : 'unset'};
         }
 
         return (
-            <li key={item.id} className="comics__item">
-                <a href="#">
+            <li key={i} className="comics__item">
+                <Link to={`/comics/${item.id}`}>
                     <img src={item.thumbnail} alt={item.name} className="comics__item-img"/>
                     <div className="comics__item-name">{item.name}</div>
                     <div className="comics__item-price">{item.price}$</div>
-                </a>
+                </Link>
            </li>
         )
     });
