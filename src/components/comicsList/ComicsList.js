@@ -18,6 +18,7 @@ const ComicsList = () => {
 
    useEffect(() => {
     onRequest(offset, true)
+      // eslint-disable-next-line
   }, [])
 
 
@@ -46,20 +47,12 @@ const ComicsList = () => {
     switch (process) {
         case 'waiting':
             return <Spinner/>
-            break
-
         case 'loading':
             return newItemLoading ? <Component/> : <Spinner/>
-            break
-
         case 'confirmed':
             return  <Component/>
-            break
-
         case 'error':
             return <ErrorMessage/>
-            break
-
             default:
                 throw new Error('Unexpected process state')
     }
@@ -67,11 +60,6 @@ const ComicsList = () => {
 
    function renderItems(arr) {
      const items =  arr.map((item, i) => {
-        let imgStyle = {'objectFit' : 'cover'};
-        if (item.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg') {
-            imgStyle = {'objectFit' : 'unset'};
-        }
-
         return (
             <CSSTransition key={i} timeout={500} classNames="comics__item">
             <li className="comics__item">
