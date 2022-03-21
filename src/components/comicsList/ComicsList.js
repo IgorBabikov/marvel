@@ -8,12 +8,12 @@ import {useState, useEffect} from 'react';
 import './comicsList.scss';
 
 const ComicsList = () => {
-    const [charList, setCharList] = useState([]);
+    const [comicsList, setCharList] = useState([]);
     const [newItemLoading, setNewItemLoading] = useState(false);
     const [offset, setOffset] = useState(210);
     const [comicsEnded, setComicsEnded] = useState(false)
 
-    const {loading, error, getAllComics} = useMarvelService();
+    const {getAllComics, process, setProcess} = useMarvelService();
 
 
    useEffect(() => {
@@ -26,23 +26,47 @@ const ComicsList = () => {
 
       getAllComics(offset)
      .then(onCharListLoaded)
+     .then(() => setProcess('confirmed'))
    }
 
-  const onCharListLoaded = (newCharList) => {
+  const onCharListLoaded = (newComicsList) => {
        let ended = false
 
-       if (newCharList.length < 8) {
+       if (newComicsList.length < 8) {
            ended = true
        }
 
-       setCharList(charList => [...charList, ...newCharList])
+       setCharList(comicsList => [...comicsList, ...newComicsList])
        setNewItemLoading(false)
        setOffset(offset => offset + 8)
        setComicsEnded(ended)
    }
 
+   const setContent = (process, Component) => {
+    switch (process) {
+        case 'waiting':
+            return <Spinner/>
+            break
+
+        case 'loading':
+            return newItemLoading ? <Component/> : <Spinner/>
+            break
+
+        case 'confirmed':
+            return  <Component/>
+            break
+
+        case 'error':
+            return <ErrorMessage/>
+            break
+
+            default:
+                throw new Error('Unexpected process state')
+    }
+}
+
    function renderItems(arr) {
-    const items =  arr.map((item, i) => {
+     const items =  arr.map((item, i) => {
         let imgStyle = {'objectFit' : 'cover'};
         if (item.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg') {
             imgStyle = {'objectFit' : 'unset'};
@@ -61,6 +85,8 @@ const ComicsList = () => {
         )
     });
 
+
+
     return (
         <ul className="comics__grid">
             <TransitionGroup component={null}>
@@ -70,15 +96,10 @@ const ComicsList = () => {
     )
 }
 
-    const items = renderItems(charList);
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const spinner = loading && !newItemLoading ? <Spinner/> : null;
 
     return (
         <div className="comics__list">
-                {errorMessage}
-                {spinner}
-                {items}
+          {setContent(process, () => renderItems(comicsList))}
 
             <button className="button button__main button__long"
                     disabled={newItemLoading}
